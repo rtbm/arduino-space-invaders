@@ -1,6 +1,6 @@
 # Arduino Space Invaders
 
-Nokia 5110 display, 5 microswitches
+Arduino Pro Micro, Nokia 5110 display, 6 microswitches
 
 ![pic](/pic.jpg)
 

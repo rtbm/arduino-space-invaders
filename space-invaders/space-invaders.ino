@@ -55,6 +55,8 @@ int score = 0;
 int shakeScreenTimeout = 0;
 int shakeScreenIntensivity = 0;
 
+int isContactTimeout = 0;
+
 boolean isHit = false;
 boolean isContact = false;
 
@@ -121,6 +123,13 @@ void loop() {
     display.print("GAME OVER!");
   }
 
+  if (isContact && isContactTimeout > 0) {
+      digitalWrite(LED_RED, HIGH);
+      isContactTimeout--;
+    } else {
+      digitalWrite(LED_RED, LOW);
+    }
+
   if (shakeScreenTimeout > 0) {
     rootX = random(0, shakeScreenIntensivity);
     rootY = random(0, shakeScreenIntensivity);
@@ -128,10 +137,7 @@ void loop() {
     if (isHit) {
       digitalWrite(LED_BLUE, HIGH);
     }
-
-    if (isContact) {
-      digitalWrite(LED_RED, HIGH);
-    }
+    
 
     shakeScreenTimeout--;
 
@@ -139,11 +145,9 @@ void loop() {
       rootX = 0;
       rootY = 0;
 
-      isHit = false;
-      isContact = false;
+      isHit = false;      
 
-      digitalWrite(LED_BLUE, LOW);
-      digitalWrite(LED_RED, LOW);
+      digitalWrite(LED_BLUE, LOW);      
     }
   }
 
@@ -159,6 +163,7 @@ void loop() {
         invadersX[j] = 0;
         invadersY[j] = 0;
 
+        isContactTimeout = 50;
         isContact = true;
 
         energy--;

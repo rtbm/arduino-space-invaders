@@ -65,30 +65,30 @@ void setup() {
   pinMode(BTN_RIGHT, INPUT_PULLUP);
   pinMode(BTN_UP, INPUT_PULLUP);
   pinMode(BTN_DOWN , INPUT_PULLUP);
-  pinMode(BTN_ACCEPT, INPUT_PULLUP);  
-  pinMode(BTN_BACK, INPUT_PULLUP);  
-  
+  pinMode(BTN_ACCEPT, INPUT_PULLUP);
+  pinMode(BTN_BACK, INPUT_PULLUP);
+
   pinMode(LCD_BACKLIGHT, OUTPUT);
   pinMode(LED_BLUE, OUTPUT);
   pinMode(LED_RED, OUTPUT);
 
-  digitalWrite(LCD_BACKLIGHT, HIGH);  
+  digitalWrite(LCD_BACKLIGHT, HIGH);
 
-  for (int i=0; i<MAX_BULLETS; i++) {
+  for (int i = 0; i < MAX_BULLETS; i++) {
     bulletsX[i] = 0;
     bulletsY[i] = 0;
   }
 
-  for (int i=0; i<MAX_INVADERS; i++) {
+  for (int i = 0; i < MAX_INVADERS; i++) {
     invadersX[i] = 0;
     invadersY[i] = 0;
   }
-  
+
   display.begin();
-  display.setContrast(60);  
+  display.setContrast(60);
   display.setTextColor(BLACK);
   display.setTextSize(1);
-  display.clearDisplay();  
+  display.clearDisplay();
   display.display();
 }
 
@@ -105,7 +105,7 @@ boolean checkForCollision(int rect1x, int rect1y, int rect1w, int rect1h,
   if (rect1x < rect2x + rect2w &&
       rect1x + rect1w > rect2x &&
       rect1y < rect2y + rect2h &&
-      rect1h + rect1y > rect2y) {      
+      rect1h + rect1y > rect2y) {
     return true;
   }
 
@@ -113,12 +113,12 @@ boolean checkForCollision(int rect1x, int rect1y, int rect1w, int rect1h,
 }
 
 void loop() {
-  display.clearDisplay();    
+  display.clearDisplay();
 
   if (isGameOver) {
-    display.setCursor(13, 20);    
+    display.setCursor(13, 20);
     digitalWrite(LED_RED, HIGH);
-    display.print("GAME OVER!");    
+    display.print("GAME OVER!");
   }
 
   if (shakeScreenTimeout > 0) {
@@ -132,7 +132,7 @@ void loop() {
     if (isContact) {
       digitalWrite(LED_RED, HIGH);
     }
-    
+
     shakeScreenTimeout--;
 
     if (shakeScreenTimeout == 0) {
@@ -149,54 +149,54 @@ void loop() {
 
   if (!isGameOver) {
     // check for contact
-    for (int j=0; j<MAX_INVADERS; j++) {   
+    for (int j = 0; j < MAX_INVADERS; j++) {
       if (invadersX[j] == 0) {
         continue;
       }
-        
+
       if (checkForCollision(invadersX[j], invadersY[j], INVADER_WIDTH, INVADER_HEIGHT,
-          playerX, playerY, PLAYER_WIDTH, PLAYER_HEIGHT) == true) {           
+                            playerX, playerY, PLAYER_WIDTH, PLAYER_HEIGHT) == true) {
         invadersX[j] = 0;
-        invadersY[j] = 0;              
+        invadersY[j] = 0;
 
         isContact = true;
-        
+
         energy--;
-  
+
         if (energy == 0) {
           isGameOver = true;
         }
-        
+
         shakeScreenTimeout = 20;
-        shakeScreenIntensivity = 10;      
+        shakeScreenIntensivity = 10;
       }
     }
-  
+
     // check for hit
-    for (int i=0; i<MAX_BULLETS; i++) {                        
-      for (int j=0; j<MAX_INVADERS; j++) {   
+    for (int i = 0; i < MAX_BULLETS; i++) {
+      for (int j = 0; j < MAX_INVADERS; j++) {
         // collision
         if (invadersX[j] == 0 || bulletsX[i] == 0) {
           continue;
         }
-  
+
         if (checkForCollision(invadersX[j], invadersY[j], INVADER_WIDTH, INVADER_HEIGHT,
-            bulletsX[i], bulletsY[i], BULLET_WIDTH, BULLET_HEIGHT) == true) {  
+                              bulletsX[i], bulletsY[i], BULLET_WIDTH, BULLET_HEIGHT) == true) {
           bulletsX[i] = 0;
-          bulletsY[i] = 0;       
-          
+          bulletsY[i] = 0;
+
           invadersX[j] = 0;
-          invadersY[j] = 0;       
-          
+          invadersY[j] = 0;
+
           shakeScreenTimeout = 5;
           shakeScreenIntensivity = 3;
 
           isHit = true;
-          
-          score++;       
+
+          score++;
 
           if (score > 0) {
-            if (score % 10 == 0 && maxInvaders < 32) {         
+            if (score % 10 == 0 && maxInvaders < 32) {
               maxInvaders += 4;
             }
 
@@ -207,45 +207,45 @@ void loop() {
         }
       }
     }
-    
+
     // draw player
     display.fillRect(rootX + playerX, rootY + playerY, 2, PLAYER_HEIGHT, BLACK);
-    display.fillRect(rootX + playerX + 2, rootY + playerY + 1, PLAYER_HEIGHT - 1, 2, BLACK);    
+    display.fillRect(rootX + playerX + 2, rootY + playerY + 1, PLAYER_HEIGHT - 1, 2, BLACK);
   }
 
   // draw bullets
-  for (int i=0; i<MAX_BULLETS; i++) {
+  for (int i = 0; i < MAX_BULLETS; i++) {
     if (bulletsX[i] == 0) {
       continue;
     }
-        
+
     bulletsX[i]++;
 
-    if(bulletsX[i] > display.width()) {
+    if (bulletsX[i] > display.width()) {
       bulletsX[i] = 0;
       bulletsY[i] = 0;
       continue;
     }
-    
-    display.fillRect(rootX + bulletsX[i], rootY + bulletsY[i], BULLET_WIDTH, BULLET_HEIGHT, BLACK);   
-  }  
 
-  // generate invaders 
-  if (random(0, invadersDensity) == 1) {        
+    display.fillRect(rootX + bulletsX[i], rootY + bulletsY[i], BULLET_WIDTH, BULLET_HEIGHT, BLACK);
+  }
+
+  // generate invaders
+  if (random(0, invadersDensity) == 1) {
     int posY = random(3, display.height() - 3);
     int posX = display.width() - 3;
 
-    for (int i=0; i<maxInvaders; i++) {
+    for (int i = 0; i < maxInvaders; i++) {
       if (invadersX[i] == 0) {
         invadersX[i] = posX;
         invadersY[i] = posY;
         break;
       }
-    }    
+    }
   }
 
   // draw invaders
-  for (int i=0; i<maxInvaders; i++) {
+  for (int i = 0; i < maxInvaders; i++) {
     if (invadersX[i] > 0) {
       invadersX[i]--;
       display.fillRect(rootX + invadersX[i], rootY + invadersY[i], INVADER_HEIGHT, INVADER_WIDTH, BLACK);
@@ -254,8 +254,8 @@ void loop() {
 
   // draw ui
   display.setCursor(rootX, rootY + display.height() - 8);
-  
-  for (int i=0; i<energy; i++) {
+
+  for (int i = 0; i < energy; i++) {
     display.write(3);
   }
 
@@ -264,47 +264,60 @@ void loop() {
 
   if (!isGameOver) {
     // actions
-    if(isButtonDown(BTN_UP)) {
+    if (isButtonDown(BTN_UP)) {
       if (playerY > 0) {
         playerY--;
       }
     }
-  
-    if(isButtonDown(BTN_DOWN)) {
+
+    if (isButtonDown(BTN_DOWN)) {
       if (playerY < display.height() - PLAYER_HEIGHT) {
         playerY++;
       }
     }
-  
-    if(isButtonDown(BTN_LEFT)) {
+
+    if (isButtonDown(BTN_LEFT)) {
       if (playerX > 0) {
         playerX--;
       }
     }
-  
-    if(isButtonDown(BTN_RIGHT)) {
+
+    if (isButtonDown(BTN_RIGHT)) {
       if (playerX < display.width() - PLAYER_WIDTH) {
-        playerX++;      
+        playerX++;
       }
-    }  
-    
+    }
+
     if (isButtonDown(BTN_ACCEPT)) {
-      for (int i=0; i<MAX_BULLETS; i++) {
+      for (int i = 0; i < MAX_BULLETS; i++) {
         if (bulletsX[i] == 0) {
           bulletsX[i] = playerX + 3;
           bulletsY[i] = playerY + 1;
           break;
         }
       }
-    } 
+    }
   } else {
     if (isButtonDown(BTN_BACK)) {
+      for (int i = 0; i < MAX_BULLETS; i++) {
+        bulletsX[i] = 0;
+        bulletsY[i] = 0;
+      }
+    
+      for (int i = 0; i < MAX_INVADERS; i++) {
+        invadersX[i] = 0;
+        invadersY[i] = 0;
+      }
+      
       playerX = 0;
       playerY = (display.height() - PLAYER_HEIGHT) / 2;
-      
+
       energy = 3;
       score = 0;
-      
+
+      maxInvaders = 5;
+      invadersDensity = 5;
+
       isGameOver = false;
 
       digitalWrite(LED_RED, LOW);
